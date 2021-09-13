@@ -2,7 +2,7 @@ module.exports = {
   1:{
     "Command": "Countdown",
     "Description": "Inserts a countdown and alerts the user once the countdown has been completed",
-    "Example": ".countdown (seconds), .cd (seconds)"
+    "Example": ".cd 12d 8h 9h 1m 0s"
   },
   2:{
     "Command": "Help",
