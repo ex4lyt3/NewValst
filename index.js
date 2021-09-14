@@ -1,5 +1,7 @@
 // Require the necessary discord.js classes
 const { Client, Intents, MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
+const { DiscordTogether } = require('discord-together');
+
 const {prefix} = require('./config.json')
 const keepAlive = require('./server.js')
 const commandList = require('./commands.js')
@@ -18,10 +20,11 @@ const client = new Client({
      } 
     });
 
-
 client.once('ready',()=>{
   console.log(`Logged in as ${client.user.tag}!`);
 })
+
+client.discordTogether = new DiscordTogether(client)
 
 client.on('messageCreate', async message=>{
   if(message.content[0]==prefix){
@@ -199,6 +202,22 @@ client.on('messageCreate', async message=>{
       ) //help end
       break;
 
+      case `play`: case `p`:
+      if (message.member.voice.channel){
+      if (args[1] == undefined){
+        client.discordTogether.createTogetherCode(message.member.voice.channel.id, 'youtube').then(async invite => {
+        return message.channel.send(`${invite.code}`);
+        });
+      }else if(args[1].toLowerCase() == "chess"){
+        client.discordTogether.createTogetherCode(message.member.voice.channel.id, 'chess').then(async invite => {
+        return message.channel.send(`${invite.code}`);
+      });
+      }
+      }else{
+        message.reply(`You must be in a voice channel to run this command!`)
+      }
+      break
+
       case `abababababababababababad`: case `tangent2circle`:
 
       message.reply(`ababababababababababd`);
@@ -213,8 +232,6 @@ client.on('messageCreate', async message=>{
       }
       break
 
-      
-   
     }//switch end
   }
 })
