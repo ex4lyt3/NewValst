@@ -1,9 +1,9 @@
-  
 // Require the necessary discord.js classes
-const { Client, Intents, MessageEmbed } = require('discord.js');
+const { Client, Intents, MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
 const {prefix} = require('./config.json')
 const keepAlive = require('./server.js')
 const commandList = require('./commands.js')
+const quoteList = require('./quotes.js')
 
 // Create a new client instance
 const client = new Client({ 
@@ -26,29 +26,31 @@ client.once('ready',()=>{
 client.on('messageCreate', async message=>{
   if(message.content[0]==prefix){
     const args = message.content.slice(prefix.length).split(' ')
-    console.log(args[0])
     switch(args[0]){
 
       case 'countdown': case 'cd':
-      
-      function isPrefix(arg){
+
+      function isPrefix(arg){         
+        if (args.length < 2){
+        message.reply(`Type your command properly!`)
+        return "false"
+        }
         let seconds = 0;
-        console.log(arg[1].substring(0,arg[1].length-1))
         for (let i = 1;i <= arg.length - 1;i++){
           console.log(i)
-          if (arg[1].includes(`d`)){
+          if (arg[i].includes(`d`)){
             let days = arg[i].substring(0,arg[i].length-1)
             seconds += days*(3600*24)
           }
-          else if (args[1].includes(`h`)){
+          else if (args[i].includes(`h`)){
             let hours = arg[i].substring(0,arg[i].length-1)
             seconds += hours*(3600)
           }
-          else if (arg[1].includes(`m`)){
+          else if (arg[i].includes(`m`)){
             let minutes = arg[i].substring(0,arg[i].length-1)
             seconds += minutes*(60)
           }
-          else if (arg[1].includes(`s`)){
+          else if (arg[i].includes(`s`)){
             let second = arg[i].substring(0,arg[i].length-1)
             seconds += second
           }
@@ -68,6 +70,7 @@ client.on('messageCreate', async message=>{
           exampleEmbed.setColor("#0099ff")
           exampleEmbed.setAuthor('Countdown', message.author.avatarURL())
           exampleEmbed.setDescription(`Countdown in ${hours} hours, ${minutes} minutes, ${seconds} seconds`)
+          exampleEmbed.setFooter(`"${quoteList[Math.floor(Math.random()*quoteList.length)]}"`)
     
           message.reply({
             embeds: [exampleEmbed]
@@ -76,19 +79,111 @@ client.on('messageCreate', async message=>{
             setTimeout(()=>{
               exampleEmbed.setAuthor(`Countdown Complete`,message.author.avatarURL())
               exampleEmbed.setDescription(`\`Countdown complete (${time} seconds)\``)
+              exampleEmbed.setFooter(`"${quoteList[Math.floor(Math.random()*quoteList.length)]}"`)
               message.reply({
                 embeds:[exampleEmbed]
               })
             },time*1000)
         } //cd command end
         break
-      
+
+      case `alarm`:
+
+      function convertToDate(arg){
+        if (args.length < 2){
+        message.reply(`Type your command properly!`)
+        return "false"
+        }
+        let year = 2021
+        let month
+        let day
+        let hours //in hours:minutes
+        let minutes 
+        let title = "Tilt"
+        for (let i = 1;i <= arg.length -1;i++){
+          if (arg[i].includes(`y`)){
+             year = arg[i].substring(0,arg[i].length-1)
+          } else if (arg[i].includes(`m`)){
+             month = arg[i].substring(0,arg[i].length-1)
+          } else if (arg[i].includes(`d`)){
+             day = arg[i].substring(0,arg[i].length-1)
+          } else if (arg[i].includes(`:`)){
+             hours = arg[i].substring(0,arg[i][":"]-1)
+             minutes = arg[i].substring(arg[i][":"]+1,arg[i].length)
+          } //else if ((arg.length == i) && (arg.length > 2)){
+           // console.log(arg.length)
+            //title = arg[arg.length]
+          //} 
+          else {
+            message.reply(`Type your command properly! | Title only allows one word currently`)
+            return false
+          }
+        }
+        console.log(hours);
+        console.log(minutes);
+        let date
+        try {
+           date = new Date();
+           date.setFullYear(year);
+           date.setMonth(month-1);
+           date.setDate(day);
+          // date.setHours(hours);
+          // date.setMinutes(minutes)
+        } catch(error){
+
+        }
+        if (date == "Invalid Date"){
+          message.reply(`Invalid numbers!`);
+          return false
+        }
+        console.log(date)
+        if ((date - Date.now())<= 0){
+          message.reply(`Your alarm has already past!`)
+          return false
+        }
+        return {
+          "Title": title,
+          "Time": (date - Date.now()),
+          "Date": date.toDateString()       
+        }
+      }
+      let alarmData = convertToDate(args)
+      console.log(alarmData)
+      if (!(alarmData == false)){
+        const alarmEmbed = new MessageEmbed()
+        alarmEmbed.setColor("#0099ff")
+        alarmEmbed.setAuthor(`Alarm | ${alarmData["Title"]}`,message.author.avatarURL())
+        alarmEmbed.setDescription(`Alarm set to ${alarmData["Date"]}`)
+
+        message.reply({
+          embeds: [alarmEmbed]
+        })
+
+        function runAtDate(date, func) {
+          var now = (new Date()).getTime();
+          var then = date.getTime();
+          var diff = Math.max((then - now), 0);
+          if (diff > 0x7FFFFFFF) //setTimeout limit is MAX_INT32=(2^31-1)
+              setTimeout(function() {runAtDate(date, func);}, 0x7FFFFFFF);
+          else
+              setTimeout(func, diff);
+        }
+      }
+      break
+
       case `help`: case `h`:
 
       const helpEmbed = new MessageEmbed()
+      const row = new MessageActionRow().addComponents(
+				new MessageButton()
+					.setLabel('Add the bot here!')
+					.setStyle('LINK')
+          .setURL('https://discord.com/api/oauth2/authorize?client_id=794202956945424415&permissions=395137313872&scope=bot%20applications.commands')
+			);
       helpEmbed.setColor("#0099ff")
       helpEmbed.setAuthor(`Commands`,client.user.avatarURL())
       helpEmbed.setDescription(`Description of Tilt's commands`)
+      helpEmbed.setFooter(`"${quoteList[Math.floor(Math.random()*quoteList.length)]}"`)
       console.log(Object.keys(commandList).length)
       for (let i = 1;i <= Object.keys(commandList).length;i++){
         helpEmbed.addFields(
@@ -98,7 +193,8 @@ client.on('messageCreate', async message=>{
 
       message.reply(
         {
-          embeds: [helpEmbed]
+          embeds: [helpEmbed],
+          components: [row]
         }
       ) //help end
       break;
@@ -107,11 +203,28 @@ client.on('messageCreate', async message=>{
 
       message.reply(`ababababababababababd`);
       break
+
+      case `shutup`: 
+      
+      if (args[1] != undefined){
+        message.channel.send(`Shut up ${args[1]}`)
+      }else{
+          message.channel.send(`Maybe I should shut down`)
+      }
+      break
+
+      
    
     }//switch end
   }
 })
 
+const arr = [1, 2, 3, 4, 5, 6, 9, 7, 8, 9, 10];
+arr.reverse();
+const used = process.memoryUsage();
+for (let key in used) {
+  console.log(`${key} ${Math.round(used[key] / 1024 / 1024 * 100) / 100} MB`);
+}
 keepAlive();
 // Login to Discord with your client's token
 client.login(process.env.token);
