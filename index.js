@@ -1,9 +1,9 @@
-  
 // Require the necessary discord.js classes
 const { Client, Intents, MessageEmbed } = require('discord.js');
 const {prefix} = require('./config.json')
 const keepAlive = require('./server.js')
 const commandList = require('./commands.js')
+const quoteList = require('./quotes.js')
 
 // Create a new client instance
 const client = new Client({ 
@@ -36,19 +36,19 @@ client.on('messageCreate', async message=>{
         console.log(arg[1].substring(0,arg[1].length-1))
         for (let i = 1;i <= arg.length - 1;i++){
           console.log(i)
-          if (arg[1].includes(`d`)){
+          if (arg[i].includes(`d`)){
             let days = arg[i].substring(0,arg[i].length-1)
             seconds += days*(3600*24)
           }
-          else if (args[1].includes(`h`)){
+          else if (args[i].includes(`h`)){
             let hours = arg[i].substring(0,arg[i].length-1)
             seconds += hours*(3600)
           }
-          else if (arg[1].includes(`m`)){
+          else if (arg[i].includes(`m`)){
             let minutes = arg[i].substring(0,arg[i].length-1)
             seconds += minutes*(60)
           }
-          else if (arg[1].includes(`s`)){
+          else if (arg[i].includes(`s`)){
             let second = arg[i].substring(0,arg[i].length-1)
             seconds += second
           }
@@ -68,6 +68,7 @@ client.on('messageCreate', async message=>{
           exampleEmbed.setColor("#0099ff")
           exampleEmbed.setAuthor('Countdown', message.author.avatarURL())
           exampleEmbed.setDescription(`Countdown in ${hours} hours, ${minutes} minutes, ${seconds} seconds`)
+          exampleEmbed.setFooter(`"${quoteList[Math.floor(Math.random()*quoteList.length)]}"`)
     
           message.reply({
             embeds: [exampleEmbed]
@@ -76,6 +77,7 @@ client.on('messageCreate', async message=>{
             setTimeout(()=>{
               exampleEmbed.setAuthor(`Countdown Complete`,message.author.avatarURL())
               exampleEmbed.setDescription(`\`Countdown complete (${time} seconds)\``)
+              exampleEmbed.setFooter(`"${quoteList[Math.floor(Math.random()*quoteList.length)]}"`)
               message.reply({
                 embeds:[exampleEmbed]
               })
@@ -89,6 +91,7 @@ client.on('messageCreate', async message=>{
       helpEmbed.setColor("#0099ff")
       helpEmbed.setAuthor(`Commands`,client.user.avatarURL())
       helpEmbed.setDescription(`Description of Tilt's commands`)
+      helpEmbed.setFooter(`"${quoteList[Math.floor(Math.random()*quoteList.length)]}"`)
       console.log(Object.keys(commandList).length)
       for (let i = 1;i <= Object.keys(commandList).length;i++){
         helpEmbed.addFields(
@@ -107,11 +110,25 @@ client.on('messageCreate', async message=>{
 
       message.reply(`ababababababababababd`);
       break
+
+      case `shutup`: 
+      
+      if (args[1] != undefined){
+        message.channel.send(`Shut up ${args[1]}`)
+      }else{
+          message.channel.send(`Maybe I should shut down`)
+      }
    
     }//switch end
   }
 })
 
+const arr = [1, 2, 3, 4, 5, 6, 9, 7, 8, 9, 10];
+arr.reverse();
+const used = process.memoryUsage();
+for (let key in used) {
+  console.log(`${key} ${Math.round(used[key] / 1024 / 1024 * 100) / 100} MB`);
+}
 keepAlive();
 // Login to Discord with your client's token
 client.login(process.env.token);
