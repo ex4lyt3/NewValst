@@ -204,11 +204,20 @@ client.on('messageCreate', async message=>{
 
       case `play`: case `p`:
       if (message.member.voice.channel){
+        let playEmbed = new MessageEmbed()
+        playEmbed.setDescription(`Click on the link to get in the fun! :partying_face:`)
+        playEmbed.setFooter(`"${quoteList[Math.floor(Math.random()*quoteList.length)]}"`)
       if (args[1] == undefined){
+        playEmbed.setColor("#FF0000")
+        playEmbed.setAuthor(`${message.author.username} has started a Youtube Together session in ${message.member.voice.channel.name}! :popcorn:` , message.author.avatarURL())
         client.discordTogether.createTogetherCode(message.member.voice.channel.id, 'youtube').then(async invite => {
-        return message.channel.send(`${invite.code}`);
+        return message.channel.send({
+          embeds: [playEmbed],
+          content: `${invite.code}`
+        });
         });
       }else if(args[1].toLowerCase() == "chess"){
+        playEmbed.setAuthor(`${message.author.username} has started a Chess session in ${message.member.voice.channel.name}!`,message.author.avatarURL())
         client.discordTogether.createTogetherCode(message.member.voice.channel.id, 'chess').then(async invite => {
         return message.channel.send(`${invite.code}`);
       });
