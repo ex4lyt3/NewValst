@@ -9,7 +9,9 @@ const quoteList = require('./quotes.js')
 
 // Create a new client instance
 const client = new Client({ 
-  intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES], 
+  intents: [Intents.FLAGS.GUILDS, 
+  Intents.FLAGS.GUILD_MESSAGES,
+  Intents.FLAGS.GUILD_VOICE_STATES], 
   presence: {
       status: 'online',
       activities: [{
@@ -20,11 +22,19 @@ const client = new Client({
      } 
     });
 
+//client.on("debug", function(info){
+   //console.log(`debug -> ${info}`);
+//});
+
 client.once('ready',()=>{
   console.log(`Logged in as ${client.user.tag}!`);
 })
 
 client.discordTogether = new DiscordTogether(client)
+
+client.on('rateLimit', (info) => {
+  console.log(`Rate limit hit ${info.timeDifference ? info.timeDifference : info.timeout ? info.timeout: 'Unknown timeout '}`)
+})
 
 client.on('messageCreate', async message=>{
   if(message.content[0]==prefix){
@@ -209,7 +219,8 @@ client.on('messageCreate', async message=>{
         playEmbed.setFooter(`"${quoteList[Math.floor(Math.random()*quoteList.length)]}"`)
       if (args[1] == undefined){
         playEmbed.setColor("#FF0000")
-        playEmbed.setAuthor(`${message.author.username} has started a Youtube Together session in ${message.member.voice.channel.name}! :popcorn:` , message.author.avatarURL())
+        playEmbed.setTitle(`${message.author.username} has started a Youtube Together session in ${message.member.voice.channel.name}! :popcorn:`)
+        playEmbed.setAuthor(`Youtube Together Session`,message.author.avatarURL())
         client.discordTogether.createTogetherCode(message.member.voice.channel.id, 'youtube').then(async invite => {
         return message.channel.send({
           embeds: [playEmbed],
@@ -217,11 +228,16 @@ client.on('messageCreate', async message=>{
         });
         });
       }else if(args[1].toLowerCase() == "chess"){
-        playEmbed.setAuthor(`${message.author.username} has started a Chess session in ${message.member.voice.channel.name}!`,message.author.avatarURL())
+         playEmbed.setColor("#FFFFFF")
+        playEmbed.setTitle(`${message.author.username} has started a Chess session in ${message.member.voice.channel.name}! :chess_pawn:`)
+        playEmbed.setAuthor(`Chess Session`,message.author.avatarURL())
         client.discordTogether.createTogetherCode(message.member.voice.channel.id, 'chess').then(async invite => {
-        return message.channel.send(`${invite.code}`);
-      });
-      }
+        return message.channel.send({
+          embeds: [playEmbed],
+          content: `${invite.code}`
+        });
+        });
+      };
       }else{
         message.reply(`You must be in a voice channel to run this command!`)
       }
@@ -254,3 +270,5 @@ for (let key in used) {
 keepAlive();
 // Login to Discord with your client's token
 client.login(process.env.token);
+
+
