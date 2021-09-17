@@ -1,11 +1,16 @@
 // Require the necessary discord.js classes
 const { Client, Intents, MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
 const { DiscordTogether } = require('discord-together');
+const Luxon = require('luxon')
+const Database = require("@replit/database")
+
 
 const {prefix} = require('./config.json')
 const keepAlive = require('./server.js')
 const commandList = require('./commands.js')
 const quoteList = require('./quotes.js')
+
+const db = new Database()
 
 // Create a new client instance
 const client = new Client({ 
@@ -76,6 +81,7 @@ client.on('messageCreate', async message=>{
       let time = isPrefix(args)
       if (isNaN(time) == false){
           
+          const date = Date.now()
           let hours = Math.floor(time/3600)
           let minutes = Math.floor((time/3600-hours)*60)
           let seconds = Math.floor(((time-hours*3600-minutes*60)))
@@ -84,14 +90,23 @@ client.on('messageCreate', async message=>{
           exampleEmbed.setAuthor('Countdown', message.author.avatarURL())
           exampleEmbed.setDescription(`Countdown in ${hours} hours, ${minutes} minutes, ${seconds} seconds`)
           exampleEmbed.setFooter(`"${quoteList[Math.floor(Math.random()*quoteList.length)]}"`)
-    
-          message.reply({
+          
+          db.list().then(keys => {
+            console.log(keys.length)
+             db.set(`CD${keys.length + 1}`, [date,time*1000] ).then(() => {});
+           
+          });
+          db.list().then(keys => {
+            console.log(keys)
+          });
+
+            message.reply({
             embeds: [exampleEmbed]
           });
           console.log(time);
             setTimeout(()=>{
               exampleEmbed.setAuthor(`Countdown Complete`,message.author.avatarURL())
-              exampleEmbed.setDescription(`\`Countdown complete (${time} seconds)\``)
+              exampleEmbed.setDescription(`Countdown complete (${hours} hours, ${minutes} minutes, ${seconds} seconds)`)
               exampleEmbed.setFooter(`"${quoteList[Math.floor(Math.random()*quoteList.length)]}"`)
               message.reply({
                 embeds:[exampleEmbed]
@@ -113,7 +128,10 @@ client.on('messageCreate', async message=>{
         let hours //in hours:minutes
         let minutes 
         let title = "Tilt"
-        for (let i = 1;i <= arg.length -1;i++){
+        let timezone = `GMT`
+        for (let i = 1;i <= (arg.length - 1);i++){
+          console.log(arg[arg.length - 1])
+          console.log(arg[i])
           if (arg[i].includes(`y`)){
              year = arg[i].substring(0,arg[i].length-1)
           } else if (arg[i].includes(`m`)){
@@ -123,10 +141,12 @@ client.on('messageCreate', async message=>{
           } else if (arg[i].includes(`:`)){
              hours = arg[i].substring(0,arg[i][":"]-1)
              minutes = arg[i].substring(arg[i][":"]+1,arg[i].length)
-          } //else if ((arg.length == i) && (arg.length > 2)){
-           // console.log(arg.length)
-            //title = arg[arg.length]
-          //} 
+          } else if (arg[arg.length-2] == arg[i]){
+            timezone = normalizeZone(arg[i])
+            console.log(timezone)
+          } else if ((arg[arg.length - 1] == arg[i]) && (arg.length > 2)){
+            title = arg[arg.length]
+          } 
           else {
             message.reply(`Type your command properly! | Title only allows one word currently`)
             return false
@@ -232,6 +252,16 @@ client.on('messageCreate', async message=>{
         playEmbed.setTitle(`${message.author.username} has started a Chess session in ${message.member.voice.channel.name}! :chess_pawn:`)
         playEmbed.setAuthor(`Chess Session`,message.author.avatarURL())
         client.discordTogether.createTogetherCode(message.member.voice.channel.id, 'chess').then(async invite => {
+        return message.channel.send({
+          embeds: [playEmbed],
+          content: `${invite.code}`
+        });
+        });
+      }else if(args[1].toLowerCase() == "betrayal"){
+         playEmbed.setColor("#FFFFFF")
+        playEmbed.setTitle(`${message.author.username} has started a Betrayal (Similar to Among Us) session in ${message.member.voice.channel.name}! :question_mark:`)
+        playEmbed.setAuthor(`Betrayal Session`,message.author.avatarURL())
+        client.discordTogether.createTogetherCode(message.member.voice.channel.id, 'betrayal').then(async invite => {
         return message.channel.send({
           embeds: [playEmbed],
           content: `${invite.code}`
