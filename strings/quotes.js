@@ -28,6 +28,11 @@ module.exports =  [
     "There’s never enough time to do all the nothing you want.",
     "You can’t have a better tomorrow if you are thinking about yesterday all the time.",
     "Better an hour too early than a minute too late.",
-    "Time cannot stop and does not wait."   
+    "Time cannot stop and does not wait."   ,
+    "Time flies like an arrow; fruit flies like a banana.",
+    "Don’t waste your time in anger, regrets, worries, and grudges. Life is too short to be unhappy.",
+    "The two most powerful warriors are patience and time.",
+    
+
 ]
 

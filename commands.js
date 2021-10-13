@@ -10,9 +10,9 @@ module.exports = {
     "Example": ".help, .h"
   },
   3:{
-    "Command": "abababababababababababad",
-    "Description": "Future is radiant",
-    "Example": ".abababababababababababad, .tangent2circle"
+    "Command": "Quote",
+    "Description": "Replies with a random time quote",
+    "Example": ".quote, .q"
   },
   4:{
     "Command": "Alarm",
@@ -23,5 +23,15 @@ module.exports = {
     "Command": "Play",
     "Description": "Enables users to watch youtube videos or play games on voice channels! | Note: Only works on desktop.",
     "Example": ".p/.p yt/.p chess"
+  },
+  6:{
+    "Command": "8ball",
+    "Description": "Replies with an 8ball answer",
+    "Example": ".8ball"
+  },
+  7:{
+    "Command": "abababababababababababad",
+    "Description": "Future is radiant",
+    "Example": ".abababababababababababad, .tangent2circle"
   }
 }

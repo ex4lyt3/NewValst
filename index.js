@@ -8,9 +8,11 @@ const Database = require("@replit/database")
 const {prefix} = require('./config.json')
 const keepAlive = require('./server.js')
 const commandList = require('./commands.js')
-const quoteList = require('./quotes.js')
+const quoteList = require('./strings/quotes.js')
+const eightBall = require('./strings/eight.js')
 
-const db = new Database()
+const database = new Database()
+
 
 // Create a new client instance
 const client = new Client({ 
@@ -31,8 +33,9 @@ const client = new Client({
    //console.log(`debug -> ${info}`);
 //});
 
-client.once('ready',()=>{
-  console.log(`Logged in as ${client.user.tag}!`);
+
+client.once("ready", () => {
+  console.log("Ready")
 })
 
 client.discordTogether = new DiscordTogether(client)
@@ -91,12 +94,12 @@ client.on('messageCreate', async message=>{
           exampleEmbed.setDescription(`Countdown in ${hours} hours, ${minutes} minutes, ${seconds} seconds`)
           exampleEmbed.setFooter(`"${quoteList[Math.floor(Math.random()*quoteList.length)]}"`)
           
-          db.list().then(keys => {
+          database.list().then(keys => {
             console.log(keys.length)
-             db.set(`CD${keys.length + 1}`, [date,time*1000] ).then(() => {});
-           
+             database.set(`CDX${keys.length + 1}`, `${date},${time*1000},${message.channelId},${message.id}` ).then(() => {});
+          
           });
-          db.list().then(keys => {
+          database.list().then(keys => {
             console.log(keys)
           });
 
@@ -259,7 +262,7 @@ client.on('messageCreate', async message=>{
         });
       }else if(args[1].toLowerCase() == "betrayal"){
          playEmbed.setColor("#FFFFFF")
-        playEmbed.setTitle(`${message.author.username} has started a Betrayal (Similar to Among Us) session in ${message.member.voice.channel.name}! :question_mark:`)
+        playEmbed.setTitle(`${message.author.username} has started a Betrayal (amogus style) session in ${message.member.voice.channel.name}! :question:`)
         playEmbed.setAuthor(`Betrayal Session`,message.author.avatarURL())
         client.discordTogether.createTogetherCode(message.member.voice.channel.id, 'betrayal').then(async invite => {
         return message.channel.send({
@@ -283,9 +286,38 @@ client.on('messageCreate', async message=>{
       if (args[1] != undefined){
         message.channel.send(`Shut up ${args[1]}`)
       }else{
-          message.channel.send(`Maybe I should shut down`)
+          message.channel.send(`but why me`)
       }
       break
+
+      case "quote": case "q":
+      
+      message.reply(`"${quoteList[Math.floor(Math.random()*quoteList.length)]}"`)
+
+      break
+
+      case "8ball":
+
+      let eightMessage = new MessageEmbed()
+      eightMessage.setDescription(":8ball:")
+
+      for (let i=0;i<(args.length);i++){
+        switch (args[i]){
+          case "u": case "you": case "YOU": case "U":
+          eightMessage.setFooter("Very doubtful.")
+          message.reply({
+            embeds: [eightMessage]
+          })
+          return
+        }}
+        eightMessage.setFooter(`${eightBall[Math.floor(Math.random()*eightBall.length)]}`)
+        message.reply({
+          embeds:[eightMessage]
+        })
+
+
+      break
+
 
     }//switch end
   }
