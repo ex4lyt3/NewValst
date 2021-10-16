@@ -30,8 +30,8 @@ module.exports = {
     "Example": ".8ball"
   },
   7:{
-    "Command": "abababababababababababad",
-    "Description": "Future is radiant",
-    "Example": ".abababababababababababad, .tangent2circle"
+    "Command": "Me",
+    "Description": "not them",
+    "Example": ".me"
   }
 }

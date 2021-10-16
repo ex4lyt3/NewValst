@@ -29,9 +29,9 @@ const client = new Client({
      } 
     });
 
-//client.on("debug", function(info){
-   //console.log(`debug -> ${info}`);
-//});
+client.on("debug", function(info){
+   console.log(`debug -> ${info}`);
+});
 
 
 client.once("ready", () => {
@@ -276,11 +276,6 @@ client.on('messageCreate', async message=>{
       }
       break
 
-      case `abababababababababababad`: case `tangent2circle`:
-
-      message.reply(`ababababababababababd`);
-      break
-
       case `shutup`: 
       
       if (args[1] != undefined){
@@ -297,6 +292,11 @@ client.on('messageCreate', async message=>{
       break
 
       case "8ball":
+
+      if (args.length < 3){
+        message.reply("Do you have anything to say?")
+        return
+      }
 
       let eightMessage = new MessageEmbed()
       eightMessage.setDescription(":8ball:")
@@ -316,6 +316,30 @@ client.on('messageCreate', async message=>{
         })
 
 
+      break
+
+      case "avatar":
+
+      let avatarMessage = new MessageEmbed()
+
+      if (!message.mentions.members.size){
+      avatarMessage.setAuthor(`${message.author.username}'s Avatar`)
+      avatarMessage.setImage(message.author.displayAvatarURL())
+      }else{
+        let avatarMention = message.mentions.members.first()
+        avatarMessage.setAuthor(`${avatarMention.user.username}'s Avatar`)
+        avatarMessage.setImage(avatarMention.user.displayAvatarURL())
+      }
+
+      message.channel.send({
+        embeds:[avatarMessage]
+      });
+
+      break
+
+      case "me":
+
+            message.channel.send("not them")
       break
 
 

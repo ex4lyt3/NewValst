@@ -31,8 +31,7 @@ module.exports =  [
     "Time cannot stop and does not wait."   ,
     "Time flies like an arrow; fruit flies like a banana.",
     "Don’t waste your time in anger, regrets, worries, and grudges. Life is too short to be unhappy.",
+    "Me, not them."
     "The two most powerful warriors are patience and time.",
-    
-
 ]
 
